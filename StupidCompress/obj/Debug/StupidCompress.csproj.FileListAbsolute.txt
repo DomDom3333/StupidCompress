@@ -1,0 +1,10 @@
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\bin\Debug\StupidCompress.exe.config
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\bin\Debug\StupidCompress.exe
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\bin\Debug\StupidCompress.pdb
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.FORM_Main.resources
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.Properties.Resources.resources
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.csproj.GenerateResource.cache
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.csproj.CoreCompileInputs.cache
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.exe
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.pdb
+C:\Users\Dominik\source\repos\StupidCompress\StupidCompress\obj\Debug\StupidCompress.csprojAssemblyReference.cache
