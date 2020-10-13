@@ -120,15 +120,18 @@ namespace StupidCompress
         private byte[] readFile(string path) //reads file and creates an array with data length and File type baked in
         {
             byte[] rawBytes = File.ReadAllBytes(path);
+            //DEBUG CODE listFirstEntries(ref rawBytes, 20);
             int dataLength = rawBytes.Length;
             string fileType = Path.GetExtension(tb_PathToCompress.Text);
             byte[] outputBytes = bakeInFileInfo(dataLength,fileType);
-            rawBytes.CopyTo(outputBytes, (BitConverter.GetBytes(dataLength).Length + Encoding.ASCII.GetBytes(fileType).Length + 1));
+            rawBytes.CopyTo(outputBytes, (5 + Encoding.ASCII.GetBytes(fileType).Length + 1));
             return outputBytes;
         }
         private byte[] bakeInFileInfo(int dataLength, string fileType) //Takes care of handeling the extra data encoding and combination of arrays
         {
-            int lengthToAdd = ((Encoding.ASCII.GetBytes(fileType).Length) + (BitConverter.GetBytes(dataLength).Length) + 2);
+            int lengthToAdd = (5 + (Encoding.Default.GetBytes(fileType).Length) + 1);
+            //int lengthToAdd = (5 + (BitConverter.GetBytes(dataLength).Length) + 1);
+            //Encoding.Default.GetString(fileTypeBytes);
             byte[] outputBytes = new byte[(dataLength + lengthToAdd)];
             bakeInFileLength(ref outputBytes,  dataLength);
             bakeInFileType(ref outputBytes, fileType);
@@ -139,12 +142,7 @@ namespace StupidCompress
             byte[] fileTypeAsByte = Encoding.ASCII.GetBytes(fileType);
             byte[] fileTypeToBake = new byte[fileTypeAsByte.Length + 1];
             fileTypeAsByte.CopyTo(fileTypeToBake, 0);
-            int startingByte = 0;
-            for (int i = 0; outputBytes[i] != 0; i++)
-            {
-                startingByte++; //+1 for getting to the 0 and another +1 for getting to actual start
-            }
-            startingByte++;
+            int startingByte = 5;
             for (int i = 0; i < fileTypeToBake.Length; i++)
             {
                 outputBytes[i+startingByte] = fileTypeToBake[i];
@@ -153,13 +151,12 @@ namespace StupidCompress
         private void bakeInFileLength(ref byte[] outputBytes,  int dataLength) //encodes and adds the data length to the array
         {
             byte[] dataLengthAsByte = BitConverter.GetBytes(dataLength);
-            byte[] dataLengthToBake = new byte[dataLengthAsByte.Length + 1];
-            dataLengthAsByte.CopyTo(dataLengthToBake, 0);
-
-            for (int i = 0; i < dataLengthToBake.Length; i++)
-            {
-                outputBytes[i] = dataLengthToBake[i];
-            }
+            byte[] dataLengthToBake = dataLengthAsByte.Skip(0).Take(5).ToArray();
+            dataLengthToBake.CopyTo(outputBytes, 0);
+            //for(int i = 0; i < dataLengthToBake.Length; i++)
+            //{
+            //    outputBytes[i] = dataLengthToBake[i];
+            //}
         }
         private int calculateResolution(int dataSize) //calculates the needed resolution really quick. Assumes that the resoluiton should be square. Option can be added to use different resolution
         {
@@ -167,28 +164,31 @@ namespace StupidCompress
         }
         private void decompress() //All the decompression and decoding functions
         {
-            Bitmap bmp = new Bitmap(tb_PathToCompress.Text);
-            BitmapData bmpDATA = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
-            byte[] input = new byte[(bmpDATA.Stride * bmp.Height)];
-            IntPtr ptr = bmpDATA.Scan0;
-            Marshal.Copy(ptr, input, 0, input.Length);
+            byte[] input;
+            Bitmap bmp;
+            BitmapData bmpDATA;
+            try
+            {
+                bmp = new Bitmap(tb_PathToCompress.Text);
+                bmpDATA = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
+                input = new byte[(bmpDATA.Stride * bmp.Height)];
+                IntPtr ptr = bmpDATA.Scan0;
+                Marshal.Copy(ptr, input, 0, input.Length);
+                //DEBUG CODE listFirstEntries(ref input, 20);
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("This png caused an error while reading. Please ensure the validity of the file and try again.", "Error while reading", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             if (!checkFileLegitimacy(ref input)) //checks if file is legitimate (made by this application)
             {
                 DialogResult result = MessageBox.Show("This file is not a file made by this application. To avoid errors, please only use PNG files made by this application", "Invalid File", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                if (result == DialogResult.No)
-                {
-                    return; //if user answers no, programm halts.
-                }
+                return;
             }
-            byte[] dataLengthBytes = new byte[4];
+            byte[] dataLengthBytes = input.Skip(0).Take(4).ToArray();
             byte[] tempFileTypeBytes = new byte[8];
-            int startingByte = 0;
-            for(int i = 0; input[i] != 0; i++) //gets Datalength bytes
-            {
-                dataLengthBytes[i] = input[i];
-                startingByte++; //+1 for getting to the 0 
-            }
-            startingByte++;//and another +1 for getting to FileType start
+            int startingByte = 5;
             int fileTypeStart = startingByte;
             for (int i = 0; input[i + fileTypeStart] != 0; i++) //gets Filetype bytes
             {
@@ -204,6 +204,7 @@ namespace StupidCompress
               {
                   realData[i] = input[i + startingByte];
               });
+            //DEBUG CODE listFirstEntries(ref realData, 20);
             string path = tb_PathToOutput.Text + "\\" + tb_FileName.Text + fileType;
             File.WriteAllBytes(path, realData); //saves the data array to the path
             bmp.Dispose(); //cleanup
@@ -213,13 +214,21 @@ namespace StupidCompress
         }
         private byte[] grabFirstBytes(int count, string path) //grabs the first few bytes of a file to check intgrity
         {
+            //byte[] testinput = new byte[count];
+            //using (Stream f = new FileStream(path, FileMode.Open))
+            //{
+            //    for(int i = 0;i < count; i++){
+            //        testinput[i] = (byte)f.ReadByte();
+            //    }
+            //}
+            //return testinput;
             byte[] input = File.ReadAllBytes(path);
             byte[] output = input.Skip(0).Take(count).ToArray();
             return output;
         }
         private bool checkFileLegitimacy(ref byte[] input) //checks for specific file pattern at the start of the file. Could be made more robust by fixing the datalength to a fixed byte count. If fixed, should be 4 because that fits maximum datalength
         {
-            if((input[3] == 0 ^ input[4] == 0) && (input[4] == 46 ^ input[5] == 46))
+            if(input[4] == 0 && input[5] == 46)
             {
                 return true;
             }
@@ -242,6 +251,7 @@ namespace StupidCompress
             BackgroundWorker worker = sender as BackgroundWorker;
             worker.ReportProgress(0);
             byte[] outputBytes = readFile(tb_PathToCompress.Text);
+            //DEBUG CODE listFirstEntries(ref outputBytes, 20);
             worker.ReportProgress(15);
             int size = calculateResolution(outputBytes.Length);
             worker.ReportProgress(20);
@@ -278,6 +288,19 @@ namespace StupidCompress
             {
                 updateStatus("Done and Ready");
             }
+        }
+
+
+        /*DEBUG CODE! ONLY USED FOR DEBUGGING PURPOSES!
+         *
+         */
+        private void listFirstEntries(ref byte[] arrToList, int amount)
+        {
+            for(int i = 0; i < amount; i++)
+            {
+                Console.WriteLine(arrToList[i]);
+            }
+            Console.WriteLine("--------------------------------------------------------");
         }
     }
 }
