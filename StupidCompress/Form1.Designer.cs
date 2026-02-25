@@ -46,9 +46,10 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.tb_FileName = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.tb_Status = new System.Windows.Forms.TextBox();
-            this.bgW_ImageConverter = new System.ComponentModel.BackgroundWorker();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.pb_Progress = new System.Windows.Forms.ToolStripProgressBar();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // bt_Start
@@ -56,7 +57,7 @@
             this.bt_Start.Location = new System.Drawing.Point(12, 83);
             this.bt_Start.Name = "bt_Start";
             this.bt_Start.Size = new System.Drawing.Size(75, 23);
-            this.bt_Start.TabIndex = 0;
+            this.bt_Start.TabIndex = 10;
             this.bt_Start.Text = "Start";
             this.bt_Start.UseVisualStyleBackColor = true;
             this.bt_Start.Click += new System.EventHandler(this.bt_Start_Click);
@@ -66,7 +67,7 @@
             this.bt_Clear.Location = new System.Drawing.Point(93, 83);
             this.bt_Clear.Name = "bt_Clear";
             this.bt_Clear.Size = new System.Drawing.Size(75, 23);
-            this.bt_Clear.TabIndex = 1;
+            this.bt_Clear.TabIndex = 11;
             this.bt_Clear.Text = "Clear";
             this.bt_Clear.UseVisualStyleBackColor = true;
             this.bt_Clear.Click += new System.EventHandler(this.bt_Clear_Click);
@@ -76,7 +77,7 @@
             this.bt_Settings.Location = new System.Drawing.Point(174, 83);
             this.bt_Settings.Name = "bt_Settings";
             this.bt_Settings.Size = new System.Drawing.Size(75, 23);
-            this.bt_Settings.TabIndex = 2;
+            this.bt_Settings.TabIndex = 12;
             this.bt_Settings.Text = "Settings";
             this.bt_Settings.UseVisualStyleBackColor = true;
             this.bt_Settings.Click += new System.EventHandler(this.bt_Settings_Click);
@@ -86,7 +87,7 @@
             this.bt_Exit.Location = new System.Drawing.Point(255, 83);
             this.bt_Exit.Name = "bt_Exit";
             this.bt_Exit.Size = new System.Drawing.Size(75, 23);
-            this.bt_Exit.TabIndex = 3;
+            this.bt_Exit.TabIndex = 13;
             this.bt_Exit.Text = "Exit";
             this.bt_Exit.UseVisualStyleBackColor = true;
             this.bt_Exit.Click += new System.EventHandler(this.bt_Exit_Click);
@@ -113,11 +114,11 @@
             // 
             // cb_OutpuSelect
             // 
+            this.cb_OutpuSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cb_OutpuSelect.FormattingEnabled = true;
             this.cb_OutpuSelect.Items.AddRange(new object[] {
             "Compress",
-            "Decompress",
-            "Sounds (WIP)"});
+            "Decompress"});
             this.cb_OutpuSelect.Location = new System.Drawing.Point(105, 56);
             this.cb_OutpuSelect.Name = "cb_OutpuSelect";
             this.cb_OutpuSelect.Size = new System.Drawing.Size(121, 21);
@@ -125,10 +126,13 @@
             // 
             // tb_PathToCompress
             // 
+            this.tb_PathToCompress.AllowDrop = true;
             this.tb_PathToCompress.Location = new System.Drawing.Point(105, 6);
             this.tb_PathToCompress.Name = "tb_PathToCompress";
             this.tb_PathToCompress.Size = new System.Drawing.Size(548, 20);
             this.tb_PathToCompress.TabIndex = 4;
+            this.tb_PathToCompress.DragDrop += new System.Windows.Forms.DragEventHandler(this.tb_PathToCompress_DragDrop);
+            this.tb_PathToCompress.DragEnter += new System.Windows.Forms.DragEventHandler(this.tb_PathToCompress_DragEnter);
             // 
             // tb_PathToOutput
             // 
@@ -143,7 +147,7 @@
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 13);
-            this.label1.TabIndex = 9;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Input File:";
             // 
             // label2
@@ -152,8 +156,8 @@
             this.label2.Location = new System.Drawing.Point(12, 33);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(86, 13);
-            this.label2.TabIndex = 10;
-            this.label2.Text = "Output Loctaion:";
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Output Location:";
             // 
             // label3
             // 
@@ -161,7 +165,7 @@
             this.label3.Location = new System.Drawing.Point(12, 59);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(40, 13);
-            this.label3.TabIndex = 11;
+            this.label3.TabIndex = 2;
             this.label3.Text = "Action:";
             // 
             // tb_FileName
@@ -177,44 +181,40 @@
             this.label4.Location = new System.Drawing.Point(232, 59);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(57, 13);
-            this.label4.TabIndex = 13;
+            this.label4.TabIndex = 3;
             this.label4.Text = "File Name:";
             // 
-            // tb_Status
+            // statusStrip1
             // 
-            this.tb_Status.Location = new System.Drawing.Point(336, 85);
-            this.tb_Status.Name = "tb_Status";
-            this.tb_Status.ReadOnly = true;
-            this.tb_Status.Size = new System.Drawing.Size(398, 20);
-            this.tb_Status.TabIndex = 14;
-            this.tb_Status.TabStop = false;
-            this.tb_Status.Text = "Ready";
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus,
+            this.pb_Progress});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 114);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(745, 22);
+            this.statusStrip1.TabIndex = 14;
+            this.statusStrip1.Text = "statusStrip1";
             // 
-            // bgW_ImageConverter
+            // lblStatus
             // 
-            this.bgW_ImageConverter.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgW_ImageConverter_DoWork);
-            this.bgW_ImageConverter.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgW_ImageConverter_ProgressChanged);
-            this.bgW_ImageConverter.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgW_ImageConverter_RunWorkerCompleted);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(628, 17);
+            this.lblStatus.Spring = true;
+            this.lblStatus.Text = "Ready";
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // textBox1
+            // pb_Progress
             // 
-            this.textBox1.AcceptsReturn = true;
-            this.textBox1.Location = new System.Drawing.Point(13, 113);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(721, 35);
-            this.textBox1.TabIndex = 15;
-            this.textBox1.TabStop = false;
-            this.textBox1.Text = resources.GetString("textBox1.Text");
+            this.pb_Progress.Name = "pb_Progress";
+            this.pb_Progress.Size = new System.Drawing.Size(100, 16);
             // 
             // FORM_Main
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(745, 156);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.tb_Status);
+            this.ClientSize = new System.Drawing.Size(745, 136);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tb_FileName);
             this.Controls.Add(this.label3);
@@ -233,9 +233,11 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FORM_Main";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Stupid Compress";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -260,9 +262,8 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.TextBox tb_FileName;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox tb_Status;
-        private System.ComponentModel.BackgroundWorker bgW_ImageConverter;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.ToolStripProgressBar pb_Progress;
     }
 }
-
